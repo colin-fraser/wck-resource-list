@@ -111,6 +111,7 @@ function createDoc() {
             body
               .appendParagraph(row['description'])
               .setHeading(DocumentApp.ParagraphHeading.NORMAL)
+              .setSpacingAfter(1.25)
             
             body
                 .appendParagraph('Services')
@@ -118,16 +119,45 @@ function createDoc() {
             body
                 .appendParagraph(row['services'])
                 .setHeading(DocumentApp.ParagraphHeading.NORMAL)
+                .setSpacingAfter(1.25)
             
             info_table_cells = [['', 'Contact Information']]
             info_table_cells.push(['Phone', row.phone])
+            info_table_cells.push(['Website', row.website])
             info_table_cells.push(['Email', row.email])
             info_table_cells.push(['Address', row.address])
             info_table_cells.push(['Hours', row.hours])
             info_table = body.appendTable(info_table_cells)
+
             info_table.setColumnWidth(0, 72)
             info_table.setColumnWidth(1, 72*3)
             info_table.getCell(0,1).setAttributes(style1)
+            info_table.getCell(2, 1).editAsText().setLinkUrl(row.website)
+            info_table.getCell(3, 1).editAsText().setLinkUrl("mailto:" + row.email)
+
+            let removed = 0;
+            if (!row.phone) {
+              info_table.removeRow(1 - removed)
+              removed ++
+            }
+            if (!row.website) {
+              info_table.removeRow(2 - removed)
+              removed ++
+            }
+            if (!row.email) {
+              info_table.removeRow(3 - removed) 
+              removed ++
+            }
+            if (!row.address) { 
+              info_table.removeRow(4 - removed)
+              removed ++
+            }
+            if (!row.hours) {
+              info_table.removeRow(5 - removed); 
+              removed ++
+            }
+
+            // bold left column
             for (let j = 1; j < info_table.getNumRows(); j++) {
               info_table
                 .getRow(j)
@@ -154,9 +184,15 @@ function createDoc() {
     return doc
 }
 
+function showAlert(text) {
+  alerthtml = HtmlService.createHtmlOutput('<a href="' + text + '" target="_blank">See new doc</a>')
+     .setHeight(100)
+     .setWidth(200)
+  SpreadsheetApp.getUi().showModalDialog(alerthtml, 'New doc created')
+  return
+}
+
 function main() {
     let doc = createDoc()
-    SpreadsheetApp
-        .getUi()
-        .alert(doc.getUrl())
+    showAlert(doc.getUrl())
 }

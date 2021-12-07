@@ -75,15 +75,9 @@ function createDoc() {
     Logger.log('Moved file %s to folder %s', doc.getName(), folder.getName())
 
     // set doc settings
-    let body = doc.getBody()
+    let body = doc.getBody();
     let attributes = {};
-    attributes[DocumentApp.Attribute.MARGIN_LEFT] = 72;
-    attributes[DocumentApp.Attribute.MARGIN_RIGHT] = 72;
-    attributes[DocumentApp.Attribute.INDENT_FIRST_LINE] = 0;
-    attributes[DocumentApp.Attribute.INDENT_START] = 0;
-    attributes[DocumentApp.Attribute.INDENT_END] = 0;
-    attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Arial';
-    body.setAttributes(attributes);
+    attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
 
     // Get Data
     let data = getSheetData();
@@ -93,6 +87,7 @@ function createDoc() {
         .appendParagraph("Resource List")
         .setHeading(DocumentApp.ParagraphHeading.TITLE)
         .setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    body.setHeadingAttributes(DocumentApp.ParagraphHeading.TITLE, attributes);
     body.appendParagraph("[Instructions: insert table of contents and then add page numbers]")
     body.appendPageBreak()
 
@@ -150,6 +145,11 @@ function createDoc() {
       .addFooter()
       .appendParagraph("WCK Resource List. Last updated " + Date().toString())
       .setAttributes(footerstyle)
+    
+    paragraphs = body.getParagraphs()
+    for (j in paragraphs) {
+      paragraphs[j].setAttributes(attributes)
+    }
     Logger.log(doc.getUrl())
     return doc
 }

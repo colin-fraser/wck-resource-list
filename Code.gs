@@ -8,9 +8,22 @@ const HEADER = ['resource', 'type_of_support', 'include', 'notes', 'covid_update
 var style1 = {}
 style1[DocumentApp.Attribute.BOLD] = true
 
+var h1style = {}
+h1style[DocumentApp.Attribute.BOLD] = true;
+
+var h2style = {}
+h2style[DocumentApp.Attribute.BOLD] = true;
+
+var no_bold = {};
+no_bold[DocumentApp.Attribute.BOLD] = false;
+
 var normal_text = {}
 normal_text[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
 normal_text[DocumentApp.Attribute.FONT_SIZE] = 10;
+
+var highlighted = {}
+highlighted[DocumentApp.Attribute.BACKGROUND_COLOR] = '#ffff00';
+highlighted[DocumentApp.Attribute.BOLD] = true;
 
 var footerstyle = {}
 footerstyle[DocumentApp.Attribute.ITALIC] = true
@@ -68,7 +81,6 @@ function removeRows(info_table, row, removable_rows, first_row) {
   let removed = 0;
   for (let k = 0; k < removable_rows.length; k++) {
     if (!row[removable_rows[k]]) {
-      Logger.log("Removing row %s from %s", removable_rows[k], row.resource)
       info_table.removeRow(k+first_row - removed)
       removed ++
     }
@@ -109,11 +121,14 @@ function createDoc() {
     // Add text
     body
         .appendParagraph("Contents")
-        .setHeading(DocumentApp.ParagraphHeading.TITLE)
-        .setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+        .setHeading(DocumentApp.ParagraphHeading.HEADING1)
+        .setAlignment(DocumentApp.HorizontalAlignment.CENTER)
+        .setAttributes(h1style);
     body.setHeadingAttributes(DocumentApp.ParagraphHeading.TITLE, attributes);
-    body.appendParagraph("[Instructions: insert table of contents and then add page numbers]")
-    body.appendPageBreak()
+    body
+      .appendParagraph("[Instructions: insert table of contents and then add page numbers]")
+      .setAttributes(highlighted);
+    body.appendPageBreak();
 
         // Get Data
     let data = getSheetData();
@@ -127,12 +142,15 @@ function createDoc() {
             if (data.indices.includes(i)) {
                 let support_heading = body.appendParagraph(row["type_of_support"])
                 support_heading.setHeading(DocumentApp.ParagraphHeading.HEADING1)
+                support_heading.setAttributes(h1style);
             }
             // END TYPE
 
             // RESOURCE NAME
             let resource_title = body.appendParagraph(row['resource']);
-            resource_title.setHeading(DocumentApp.ParagraphHeading.HEADING2)
+            resource_title
+              .setHeading(DocumentApp.ParagraphHeading.HEADING2)
+              .setAttributes(h2style);
             // END RESOURCE NAME
 
             // CONTACT INFO & SERVICES
@@ -153,6 +171,7 @@ function createDoc() {
             info_table = body.appendTable(info_table_cells)
             info_table.setColumnWidth(0, 72)
             info_table.setColumnWidth(1, 396)
+            info_table.setAttributes(no_bold)
             info_table.getCell(0,1).setAttributes(style1)
             info_table.getCell(2, 1).editAsText().setLinkUrl(row.website)
             info_table.getCell(3, 1).editAsText().setLinkUrl("mailto:" + row.email)

@@ -75,9 +75,15 @@ function createDoc() {
     Logger.log('Moved file %s to folder %s', doc.getName(), folder.getName())
 
     // set doc settings
-    let body = doc.getBody();
+    let body = doc.getBody()
     let attributes = {};
-    attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
+    attributes[DocumentApp.Attribute.MARGIN_LEFT] = 72;
+    attributes[DocumentApp.Attribute.MARGIN_RIGHT] = 72;
+    attributes[DocumentApp.Attribute.INDENT_FIRST_LINE] = 0;
+    attributes[DocumentApp.Attribute.INDENT_START] = 0;
+    attributes[DocumentApp.Attribute.INDENT_END] = 0;
+    attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Arial';
+    body.setAttributes(attributes);
 
     // Get Data
     let data = getSheetData();
@@ -87,7 +93,6 @@ function createDoc() {
         .appendParagraph("Resource List")
         .setHeading(DocumentApp.ParagraphHeading.TITLE)
         .setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    body.setHeadingAttributes(DocumentApp.ParagraphHeading.TITLE, attributes);
     body.appendParagraph("[Instructions: insert table of contents and then add page numbers]")
     body.appendPageBreak()
 
@@ -111,7 +116,6 @@ function createDoc() {
             body
               .appendParagraph(row['description'])
               .setHeading(DocumentApp.ParagraphHeading.NORMAL)
-              .setSpacingAfter(1.25)
             
             body
                 .appendParagraph('Services')
@@ -119,45 +123,16 @@ function createDoc() {
             body
                 .appendParagraph(row['services'])
                 .setHeading(DocumentApp.ParagraphHeading.NORMAL)
-                .setSpacingAfter(1.25)
             
             info_table_cells = [['', 'Contact Information']]
             info_table_cells.push(['Phone', row.phone])
-            info_table_cells.push(['Website', row.website])
             info_table_cells.push(['Email', row.email])
             info_table_cells.push(['Address', row.address])
             info_table_cells.push(['Hours', row.hours])
             info_table = body.appendTable(info_table_cells)
-
             info_table.setColumnWidth(0, 72)
             info_table.setColumnWidth(1, 72*3)
             info_table.getCell(0,1).setAttributes(style1)
-            info_table.getCell(2, 1).editAsText().setLinkUrl(row.website)
-            info_table.getCell(3, 1).editAsText().setLinkUrl("mailto:" + row.email)
-
-            let removed = 0;
-            if (!row.phone) {
-              info_table.removeRow(1 - removed)
-              removed ++
-            }
-            if (!row.website) {
-              info_table.removeRow(2 - removed)
-              removed ++
-            }
-            if (!row.email) {
-              info_table.removeRow(3 - removed) 
-              removed ++
-            }
-            if (!row.address) { 
-              info_table.removeRow(4 - removed)
-              removed ++
-            }
-            if (!row.hours) {
-              info_table.removeRow(5 - removed); 
-              removed ++
-            }
-
-            // bold left column
             for (let j = 1; j < info_table.getNumRows(); j++) {
               info_table
                 .getRow(j)
@@ -175,24 +150,13 @@ function createDoc() {
       .addFooter()
       .appendParagraph("WCK Resource List. Last updated " + Date().toString())
       .setAttributes(footerstyle)
-    
-    paragraphs = body.getParagraphs()
-    for (j in paragraphs) {
-      paragraphs[j].setAttributes(attributes)
-    }
     Logger.log(doc.getUrl())
     return doc
 }
 
-function showAlert(text) {
-  alerthtml = HtmlService.createHtmlOutput('<a href="' + text + '" target="_blank">See new doc</a>')
-     .setHeight(100)
-     .setWidth(200)
-  SpreadsheetApp.getUi().showModalDialog(alerthtml, 'New doc created')
-  return
-}
-
 function main() {
     let doc = createDoc()
-    showAlert(doc.getUrl())
+    SpreadsheetApp
+        .getUi()
+        .alert(doc.getUrl())
 }

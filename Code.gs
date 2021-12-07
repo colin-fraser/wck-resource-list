@@ -8,6 +8,10 @@ const HEADER = ['resource', 'type_of_support', 'include', 'notes', 'covid_update
 var style1 = {}
 style1[DocumentApp.Attribute.BOLD] = true
 
+var normal_text = {}
+normal_text[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
+normal_text[DocumentApp.Attribute.FONT_SIZE] = 10;
+
 var footerstyle = {}
 footerstyle[DocumentApp.Attribute.ITALIC] = true
 footerstyle[DocumentApp.Attribute.FONT_SIZE] = 8
@@ -60,6 +64,18 @@ function getSheetData() {
     return {indices: resource_type_indices, body: rows}
 }
 
+function removeRows(info_table, row, removable_rows, first_row) {
+  let removed = 0;
+  for (let k = 0; k < removable_rows.length; k++) {
+    if (!row[removable_rows[k]]) {
+      Logger.log("Removing row %s from %s", removable_rows[k], row.resource)
+      info_table.removeRow(k+first_row - removed)
+      removed ++
+    }
+  }
+  return removed
+}
+
 
 function createDoc() {
     // Create Doc
@@ -75,88 +91,169 @@ function createDoc() {
     Logger.log('Moved file %s to folder %s', doc.getName(), folder.getName())
 
     // set doc settings
-    let body = doc.getBody()
+    let body = doc.getBody();
     let attributes = {};
-    attributes[DocumentApp.Attribute.MARGIN_LEFT] = 72;
-    attributes[DocumentApp.Attribute.MARGIN_RIGHT] = 72;
-    attributes[DocumentApp.Attribute.INDENT_FIRST_LINE] = 0;
-    attributes[DocumentApp.Attribute.INDENT_START] = 0;
-    attributes[DocumentApp.Attribute.INDENT_END] = 0;
-    attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Arial';
-    body.setAttributes(attributes);
+    attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
 
-    // Get Data
-    let data = getSheetData();
+    let title = body
+      .appendParagraph("WCK Family Resource Guide")
+      .setHeading(DocumentApp.ParagraphHeading.TITLE)
+      .setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    
+    var title_attributes = {};
+    title_attributes[DocumentApp.Attribute.FONT_FAMILY] = "Source Sans Pro";
+    title_attributes[DocumentApp.Attribute.BOLD] = true;
+    title_attributes[DocumentApp.Attribute.FONT_SIZE] = 60;
+    title.appendPageBreak()
 
     // Add text
     body
-        .appendParagraph("Resource List")
+        .appendParagraph("Contents")
         .setHeading(DocumentApp.ParagraphHeading.TITLE)
         .setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    body.setHeadingAttributes(DocumentApp.ParagraphHeading.TITLE, attributes);
     body.appendParagraph("[Instructions: insert table of contents and then add page numbers]")
     body.appendPageBreak()
 
+        // Get Data
+    let data = getSheetData();
 
     // Add data
     for (let i = 0; i < data.body.length; i++) {
 
         let row = data.body[i];
         if (row['include']) {
+            // TYPE OF SUPPORT
             if (data.indices.includes(i)) {
                 let support_heading = body.appendParagraph(row["type_of_support"])
                 support_heading.setHeading(DocumentApp.ParagraphHeading.HEADING1)
             }
+            // END TYPE
 
+            // RESOURCE NAME
             let resource_title = body.appendParagraph(row['resource']);
             resource_title.setHeading(DocumentApp.ParagraphHeading.HEADING2)
-            body
-                .appendParagraph('Description')
-                .setAttributes(style1)
-            
-            body
-              .appendParagraph(row['description'])
-              .setHeading(DocumentApp.ParagraphHeading.NORMAL)
-            
-            body
-                .appendParagraph('Services')
-                .setAttributes(style1)
-            body
-                .appendParagraph(row['services'])
-                .setHeading(DocumentApp.ParagraphHeading.NORMAL)
-            
+            // END RESOURCE NAME
+
+            // CONTACT INFO & SERVICES
             info_table_cells = [['', 'Contact Information']]
             info_table_cells.push(['Phone', row.phone])
+            info_table_cells.push(['Website', row.website])
             info_table_cells.push(['Email', row.email])
             info_table_cells.push(['Address', row.address])
             info_table_cells.push(['Hours', row.hours])
+            info_table_cells.push(['', 'Service Information'])
+            info_table_cells.push(["Area", row.area])
+            info_table_cells.push(["Ages", row.age])
+            info_table_cells.push(["Populations served", row.populations_served])
+            info_table_cells.push(["Fees", row.fees])
+            info_table_cells.push(["Referral", row.referral])
+            info_table_cells.push(["Funding options", row.funding_options])
+            //       info table
             info_table = body.appendTable(info_table_cells)
             info_table.setColumnWidth(0, 72)
-            info_table.setColumnWidth(1, 72*3)
+            info_table.setColumnWidth(1, 396)
             info_table.getCell(0,1).setAttributes(style1)
+            info_table.getCell(2, 1).editAsText().setLinkUrl(row.website)
+            info_table.getCell(3, 1).editAsText().setLinkUrl("mailto:" + row.email)
+            info_table.getCell(6, 1).setAttributes(style1)
+
+            // remove blank rows
+            removed = removeRows(info_table, row, ['phone', 'website', 'email', 'address', 'hours'], 1)
+            removed = removeRows(info_table, row, ['area', 'ages', 'populations_served', 'fees', 'referral', 'funding_options'], 7 - removed)
+            
+            // bold left column
             for (let j = 1; j < info_table.getNumRows(); j++) {
               info_table
                 .getRow(j)
                 .getCell(0)
                 .setAttributes(style1)
             }
-          
-          if (data.indices.includes(i+1)) {
+            // END CONTACT INFO
+
+            // DESCRIPTION
+            body
+                .appendParagraph('Overview')
+                .setHeading(DocumentApp.ParagraphHeading.NORMAL)
+                .setAttributes(style1)
+            
+            body
+              .appendParagraph(row['description'])
+              .setHeading(DocumentApp.ParagraphHeading.NORMAL)
+              .setSpacingAfter(1.25)
+            // END DESCRIPTION
+            
+            // SERVICES
+            body
+                .appendParagraph('Services')
+                .setAttributes(style1)
+            body
+                .appendParagraph(row['services'])
+                .setHeading(DocumentApp.ParagraphHeading.NORMAL)
+                .setSpacingAfter(1.25)
+            // END SERVICES
+
+            
+            
+            // FULL NOTES
+            body
+              .appendParagraph('Full description')
+              .setAttributes(style1)
+            body.appendParagraph(row.notes)
+              .setHeading(DocumentApp.ParagraphHeading.NORMAL)
+              .setSpacingAfter(1.25)
+            
+            // COVID UPDATES
+            if (row.covid_updates) {
+              body
+                .appendParagraph('COVID-19 Updates')
+                .setAttributes(style1)
+              body
+                .appendParagraph(row.covid_updates)
+                .setHeading(DocumentApp.ParagraphHeading.NORMAL)
+            }
             body.appendPageBreak()
-          }
+            
+            
+            
+          
+          // if (data.indices.includes(i+1)) {
+          //   body.appendPageBreak()
+          // }
 
         }
     }
+    
+    // FOOTER
     doc
       .addFooter()
       .appendParagraph("WCK Resource List. Last updated " + Date().toString())
       .setAttributes(footerstyle)
+    
+    // APPLY STYLES
+    paragraphs = body.getParagraphs()
+    for (j in paragraphs) {
+      paragraphs[j].setAttributes(attributes);
+      if (paragraphs[j].getHeading() == DocumentApp.ParagraphHeading.NORMAL) {
+        paragraphs[j].setAttributes(normal_text)
+      }
+    }
+    title.setAttributes(title_attributes);
     Logger.log(doc.getUrl())
+
+    body.setAttributes(attributes)
     return doc
+}
+
+function showAlert(text) {
+  alerthtml = HtmlService.createHtmlOutput('<a href="' + text + '" target="_blank">See new doc</a>')
+     .setHeight(100)
+     .setWidth(200)
+  SpreadsheetApp.getUi().showModalDialog(alerthtml, 'New doc created')
+  return
 }
 
 function main() {
     let doc = createDoc()
-    SpreadsheetApp
-        .getUi()
-        .alert(doc.getUrl())
+    showAlert(doc.getUrl())
 }

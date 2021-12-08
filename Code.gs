@@ -120,22 +120,12 @@ function createDoc() {
     let attributes = {};
     attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
 
+    // Add title page
     let title_image = DriveApp.getFileById(config.title_file).getBlob()
-
     body.appendImage(title_image).setWidth(600).setHeight(320)
-
-    // let title = body
-    //   .appendParagraph("WCK Family Resource Guide")
-    //   .setHeading(DocumentApp.ParagraphHeading.TITLE)
-    //   .setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    
-    // var title_attributes = {};
-    // title_attributes[DocumentApp.Attribute.FONT_FAMILY] = "Source Sans Pro";
-    // title_attributes[DocumentApp.Attribute.BOLD] = true;
-    // title_attributes[DocumentApp.Attribute.FONT_SIZE] = 60;
     body.appendPageBreak()
 
-    // Add text
+    // Add TOC text
     body
         .appendParagraph("Contents")
         .setHeading(DocumentApp.ParagraphHeading.HEADING1)

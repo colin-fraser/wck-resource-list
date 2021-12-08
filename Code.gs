@@ -7,29 +7,29 @@ const HEADER = ['resource', 'type_of_support', 'include', 'notes', 'covid_update
     'website', 'email', 'phone', 'hours', 'age', 'area', 'fees', 'referral',
     'description', 'services', 'populations_served', 'funding_options']
 
-var style1 = {}
+const style1 = {}
 style1[DocumentApp.Attribute.BOLD] = true
 
-var h1style = {}
+const h1style = {}
 h1style[DocumentApp.Attribute.BOLD] = true;
 h1style[DocumentApp.Attribute.UNDERLINE] = true;
 
-var h2style = {}
+const h2style = {}
 h2style[DocumentApp.Attribute.BOLD] = false;
 h2style[DocumentApp.Attribute.FONT_SIZE] = 18;
 
-var no_bold = {};
+const no_bold = {};
 no_bold[DocumentApp.Attribute.BOLD] = false;
 
-var normal_text = {}
+const normal_text = {}
 normal_text[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
 normal_text[DocumentApp.Attribute.FONT_SIZE] = 10;
 
-var highlighted = {}
+const highlighted = {}
 highlighted[DocumentApp.Attribute.BACKGROUND_COLOR] = '#ffff00';
 highlighted[DocumentApp.Attribute.BOLD] = true;
 
-var footerstyle = {}
+const footerstyle = {}
 footerstyle[DocumentApp.Attribute.ITALIC] = true
 footerstyle[DocumentApp.Attribute.FONT_SIZE] = 8
 

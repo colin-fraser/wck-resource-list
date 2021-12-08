@@ -1,10 +1,11 @@
-const OUTPUT_LOCATION = '1heJIjY0Dfo9ia5BFf9fj9AEeUHxnPGS8'
+const CONFIG_SHEET_NAME = 'Config'
+const OUTPUT_LOCATION = 'B5'
+const TITLE_FILE = 'B4'
 const DOCUMENT_NAME_PREFIX = 'WCK Resource List - '
 const SHEET = 'Resources'
 const HEADER = ['resource', 'type_of_support', 'include', 'notes', 'covid_updates', 'address',
     'website', 'email', 'phone', 'hours', 'age', 'area', 'fees', 'referral',
     'description', 'services', 'populations_served', 'funding_options']
-const title_file = '1Om5HN2cmRKDhcb4vcHwlyjIJbUqzRWeV'
 
 var style1 = {}
 style1[DocumentApp.Attribute.BOLD] = true
@@ -91,8 +92,17 @@ function removeRows(info_table, row, removable_rows, first_row) {
   return removed
 }
 
+function getConfig() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG_SHEET_NAME)
+  var out = {};
+  out['title_file'] = sheet.getRange(TITLE_FILE).getValue()
+  out['output_location'] = sheet.getRange(OUTPUT_LOCATION).getValue()
+  return out
+}
 
 function createDoc() {
+
+    config = getConfig()
     // Create Doc
     doc_name = DOCUMENT_NAME_PREFIX + Date().toString()
     var doc = DocumentApp.create(doc_name)
@@ -100,7 +110,7 @@ function createDoc() {
     Logger.log('File url: %s', doc.getUrl())
 
     // Move to folder
-    var folder = DriveApp.getFolderById(OUTPUT_LOCATION)
+    var folder = DriveApp.getFolderById(config.output_location)
     Logger.log('Located folder %s named %s', folder.getId(), folder.getName())
     DriveApp.getFileById(doc.getId()).moveTo(folder)
     Logger.log('Moved file %s to folder %s', doc.getName(), folder.getName())
@@ -110,7 +120,7 @@ function createDoc() {
     let attributes = {};
     attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
 
-    let title_image = DriveApp.getFileById(title_file).getBlob()
+    let title_image = DriveApp.getFileById(config.title_file).getBlob()
 
     body.appendImage(title_image).setWidth(600).setHeight(320)
 
@@ -256,7 +266,7 @@ function createDoc() {
     // FOOTER
     doc
       .addFooter()
-      .appendParagraph("WCK Resource List. Last updated " + Date().toString())
+      .appendParagraph("WCK Family Resources List. Last updated " + Date().toString())
       .setAttributes(footerstyle)
     
     // APPLY STYLES

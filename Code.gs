@@ -10,6 +10,7 @@ const HEADER = ['resource', 'type_of_support', 'include', 'notes', 'covid_update
 const style1 = {}
 style1[DocumentApp.Attribute.BOLD] = true
 
+
 const h1style = {}
 h1style[DocumentApp.Attribute.BOLD] = true;
 h1style[DocumentApp.Attribute.UNDERLINE] = true;
@@ -30,6 +31,7 @@ highlighted[DocumentApp.Attribute.BACKGROUND_COLOR] = '#ffff00';
 highlighted[DocumentApp.Attribute.BOLD] = true;
 
 const footerstyle = {}
+
 footerstyle[DocumentApp.Attribute.ITALIC] = true
 footerstyle[DocumentApp.Attribute.FONT_SIZE] = 8
 
@@ -92,6 +94,7 @@ function removeRows(info_table, row, removable_rows, first_row) {
   return removed
 }
 
+
 function getConfig() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG_SHEET_NAME)
   var out = {};
@@ -99,6 +102,7 @@ function getConfig() {
   out['output_location'] = sheet.getRange(OUTPUT_LOCATION).getValue()
   return out
 }
+
 
 function createDoc() {
 
@@ -137,6 +141,7 @@ function createDoc() {
       .setAttributes(highlighted);
     body.appendPageBreak();
 
+
         // Get Data
     let data = getSheetData();
 
@@ -155,9 +160,11 @@ function createDoc() {
 
             // RESOURCE NAME
             let resource_title = body.appendParagraph(row['resource']);
+
             resource_title
               .setHeading(DocumentApp.ParagraphHeading.HEADING2)
               .setAttributes(h2style);
+
             // END RESOURCE NAME
 
             // CONTACT INFO & SERVICES

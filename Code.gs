@@ -308,6 +308,14 @@ function showAlert(text) {
   return;
 }
 
+function showAlert(text) {
+  alerthtml = HtmlService.createHtmlOutput('<a href="' + text + '" target="_blank">See new doc</a>')
+     .setHeight(100)
+     .setWidth(200)
+  SpreadsheetApp.getUi().showModalDialog(alerthtml, 'New doc created')
+  return
+}
+
 function main() {
   let doc = createDoc();
   showAlert(doc.getUrl());

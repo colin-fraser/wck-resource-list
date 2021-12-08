@@ -87,7 +87,6 @@ function parseResourceTypes(parsed_rows) {
 
 function getSheetData() {
   let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET);
-  sheet.range;
   let values = sheet.getDataRange().getValues();
   let header = values[0];
   let body = values.slice(1);

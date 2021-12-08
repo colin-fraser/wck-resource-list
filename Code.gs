@@ -4,15 +4,18 @@ const SHEET = 'Resources'
 const HEADER = ['resource', 'type_of_support', 'include', 'notes', 'covid_updates', 'address',
     'website', 'email', 'phone', 'hours', 'age', 'area', 'fees', 'referral',
     'description', 'services', 'populations_served', 'funding_options']
+const title_file = '1Om5HN2cmRKDhcb4vcHwlyjIJbUqzRWeV'
 
 var style1 = {}
 style1[DocumentApp.Attribute.BOLD] = true
 
 var h1style = {}
 h1style[DocumentApp.Attribute.BOLD] = true;
+h1style[DocumentApp.Attribute.UNDERLINE] = true;
 
 var h2style = {}
-h2style[DocumentApp.Attribute.BOLD] = true;
+h2style[DocumentApp.Attribute.BOLD] = false;
+h2style[DocumentApp.Attribute.FONT_SIZE] = 18;
 
 var no_bold = {};
 no_bold[DocumentApp.Attribute.BOLD] = false;
@@ -107,16 +110,20 @@ function createDoc() {
     let attributes = {};
     attributes[DocumentApp.Attribute.FONT_FAMILY] = 'Source Sans Pro';
 
-    let title = body
-      .appendParagraph("WCK Family Resource Guide")
-      .setHeading(DocumentApp.ParagraphHeading.TITLE)
-      .setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    let title_image = DriveApp.getFileById(title_file).getBlob()
+
+    body.appendImage(title_image).setWidth(600).setHeight(320)
+
+    // let title = body
+    //   .appendParagraph("WCK Family Resource Guide")
+    //   .setHeading(DocumentApp.ParagraphHeading.TITLE)
+    //   .setAlignment(DocumentApp.HorizontalAlignment.CENTER);
     
-    var title_attributes = {};
-    title_attributes[DocumentApp.Attribute.FONT_FAMILY] = "Source Sans Pro";
-    title_attributes[DocumentApp.Attribute.BOLD] = true;
-    title_attributes[DocumentApp.Attribute.FONT_SIZE] = 60;
-    title.appendPageBreak()
+    // var title_attributes = {};
+    // title_attributes[DocumentApp.Attribute.FONT_FAMILY] = "Source Sans Pro";
+    // title_attributes[DocumentApp.Attribute.BOLD] = true;
+    // title_attributes[DocumentApp.Attribute.FONT_SIZE] = 60;
+    body.appendPageBreak()
 
     // Add text
     body
@@ -169,8 +176,11 @@ function createDoc() {
             info_table_cells.push(["Funding options", row.funding_options])
             //       info table
             info_table = body.appendTable(info_table_cells)
-            info_table.setColumnWidth(0, 72)
-            info_table.setColumnWidth(1, 396)
+            let table_width = 468;
+            let col0_width = 108;
+            let col1_width = table_width - col0_width;
+            info_table.setColumnWidth(0, col0_width);
+            info_table.setColumnWidth(1, col1_width);
             info_table.setAttributes(no_bold)
             info_table.getCell(0,1).setAttributes(style1)
             info_table.getCell(2, 1).editAsText().setLinkUrl(row.website)
@@ -257,7 +267,6 @@ function createDoc() {
         paragraphs[j].setAttributes(normal_text)
       }
     }
-    title.setAttributes(title_attributes);
     Logger.log(doc.getUrl())
 
     body.setAttributes(attributes)

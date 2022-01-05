@@ -7,7 +7,7 @@ const HEADER = [
   "resource",
   "type_of_support",
   "include",
-  "notes",
+  "description",
   "covid_updates",
   "address",
   "website",
@@ -18,7 +18,6 @@ const HEADER = [
   "area",
   "fees",
   "referral",
-  "description",
   "services",
   "populations_served",
   "funding_options",
@@ -49,6 +48,8 @@ highlighted[DocumentApp.Attribute.BOLD] = true;
 const footerstyle = {};
 footerstyle[DocumentApp.Attribute.ITALIC] = true;
 footerstyle[DocumentApp.Attribute.FONT_SIZE] = 8;
+
+const after_paragraph_spacing = 10;
 
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
@@ -234,32 +235,22 @@ function createDoc() {
       }
       // END CONTACT INFO
 
-      // DESCRIPTION
+      // FULL NOTES
+      body.appendParagraph("Description")
+      .setAttributes(style1)
+      .setSpacingBefore(after_paragraph_spacing);
       body
-        .appendParagraph("Overview")
+        .appendParagraph(row.description)
         .setHeading(DocumentApp.ParagraphHeading.NORMAL)
-        .setAttributes(style1);
-
-      body
-        .appendParagraph(row["description"])
-        .setHeading(DocumentApp.ParagraphHeading.NORMAL)
-        .setSpacingAfter(1.25);
-      // END DESCRIPTION
+        .setSpacingAfter(after_paragraph_spacing);
 
       // SERVICES
       body.appendParagraph("Services").setAttributes(style1);
       body
         .appendParagraph(row["services"])
         .setHeading(DocumentApp.ParagraphHeading.NORMAL)
-        .setSpacingAfter(1.25);
+        .setSpacingAfter(after_paragraph_spacing);
       // END SERVICES
-
-      // FULL NOTES
-      body.appendParagraph("Full description").setAttributes(style1);
-      body
-        .appendParagraph(row.notes)
-        .setHeading(DocumentApp.ParagraphHeading.NORMAL)
-        .setSpacingAfter(1.25);
 
       // COVID UPDATES
       if (row.covid_updates) {
@@ -306,14 +297,6 @@ function showAlert(text) {
     .setWidth(200);
   SpreadsheetApp.getUi().showModalDialog(alerthtml, "New doc created");
   return;
-}
-
-function showAlert(text) {
-  alerthtml = HtmlService.createHtmlOutput('<a href="' + text + '" target="_blank">See new doc</a>')
-     .setHeight(100)
-     .setWidth(200)
-  SpreadsheetApp.getUi().showModalDialog(alerthtml, 'New doc created')
-  return
 }
 
 function main() {
